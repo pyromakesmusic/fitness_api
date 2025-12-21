@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import date
+from collections import defaultdict
 
 from db import SessionLocal, engine
 from models import Base, Workout, Exercise, Set
@@ -19,6 +20,7 @@ def get_db():
     finally:
         db.close()
 
+# Post an exercise
 @app.post("/exercises")
 def create_exercise(
     exercise: ExerciseCreate,
@@ -33,6 +35,7 @@ def create_exercise(
     db.refresh(new_exercise)
     return new_exercise
 
+# Post a workout
 @app.post("/workouts")
 def create_workout(
     workout: WorkoutCreate,
@@ -44,6 +47,7 @@ def create_workout(
     db.refresh(new_workout)
     return new_workout
 
+# Post a set
 @app.post("/sets")
 def add_set(
     set_data: SetCreate,
@@ -68,6 +72,7 @@ def add_set(
     db.refresh(new_set)
     return new_set
 
+# Get a workout
 @app.get("/workouts/{workout_id}/summary")
 def workout_summary(workout_id: int, db: Session = Depends(get_db)):
     workout = db.query(Workout).filter(Workout.id == workout_id).first()
@@ -94,4 +99,59 @@ def workout_summary(workout_id: int, db: Session = Depends(get_db)):
         "total_reps": total_reps,
         "total_volume_kg": round(total_volume, 2),
         "estimated_calories": round(calories, 2)
+    }
+
+# Get a history for a particular exercise
+@app.get("/exercises/{exercise_id}/history")
+def exercise_history(exercise_id: int, db: Session = Depends(get_db)):
+    exercise = db.query(Exercise).filter(Exercise.id == exercise_id).first()
+    if not exercise:
+        raise HTTPException(status_code=404, detail="Exercise not found")
+
+    # Fetch all sets for this exercise
+    sets = (
+        db.query(Set)
+        .join(Workout)
+        .filter(Set.exercise_id == exercise_id)
+        .all()
+    )
+
+    # Group data by workout date
+    history_by_date = defaultdict(lambda: {
+        "total_sets": 0,
+        "total_reps": 0,
+        "total_volume_kg": 0.0,
+        "total_work_joules": 0.0
+    })
+
+    for s in sets:
+        workout_date = s.workout.date.isoformat()
+
+        history_by_date[workout_date]["total_sets"] += 1
+        history_by_date[workout_date]["total_reps"] += s.reps
+        history_by_date[workout_date]["total_volume_kg"] += set_volume(
+            s.weight_kg, s.reps
+        )
+        history_by_date[workout_date]["total_work_joules"] += set_work_joules(
+            s.weight_kg,
+            s.reps,
+            exercise.movement_distance_m
+        )
+
+    # Format response
+    history = []
+    for date, data in sorted(history_by_date.items()):
+        calories = joules_to_calories(data["total_work_joules"])
+        history.append({
+            "date": date,
+            "total_sets": data["total_sets"],
+            "total_reps": data["total_reps"],
+            "total_volume_kg": round(data["total_volume_kg"], 2),
+            "estimated_calories": round(calories, 2)
+        })
+
+    return {
+        "exercise_id": exercise.id,
+        "exercise_name": exercise.name,
+        "history": history
     }
