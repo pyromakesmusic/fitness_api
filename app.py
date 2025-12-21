@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import date
 
@@ -49,6 +49,14 @@ def add_set(
     set_data: SetCreate,
     db: Session = Depends(get_db)
 ):
+    workout = db.query(Workout).filter(Workout.id == set_data.workout_id).first()
+    if not workout:
+        raise HTTPException(status_code=404, detail="Workout not found")
+
+    exercise = db.query(Exercise).filter(Exercise.id == set_data.exercise_id).first()
+    if not exercise:
+        raise HTTPException(status_code=404, detail="Exercise not found")
+
     new_set = Set(
         workout_id=set_data.workout_id,
         exercise_id=set_data.exercise_id,
@@ -63,6 +71,8 @@ def add_set(
 @app.get("/workouts/{workout_id}/summary")
 def workout_summary(workout_id: int, db: Session = Depends(get_db)):
     workout = db.query(Workout).filter(Workout.id == workout_id).first()
+    if not workout:
+        raise HTTPException(status_code=404, detail="Workout not found")
 
     total_sets = len(workout.sets)
     total_reps = sum(s.reps for s in workout.sets)
