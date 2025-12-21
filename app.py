@@ -5,6 +5,7 @@ from datetime import date
 from db import SessionLocal, engine
 from models import Base, Workout, Exercise, Set
 from calculations import set_volume, set_work_joules, joules_to_calories
+from schemas import ExerciseCreate, WorkoutCreate, SetCreate
 
 Base.metadata.create_all(bind=engine)
 
@@ -20,48 +21,44 @@ def get_db():
 
 @app.post("/exercises")
 def create_exercise(
-    name: str,
-    movement_distance_m: float,
+    exercise: ExerciseCreate,
     db: Session = Depends(get_db)
 ):
-    exercise = Exercise(
-        name=name,
-        movement_distance_m=movement_distance_m
+    new_exercise = Exercise(
+        name=exercise.name,
+        movement_distance_m=exercise.movement_distance_m
     )
-    db.add(exercise)
+    db.add(new_exercise)
     db.commit()
-    db.refresh(exercise)
-    return exercise
+    db.refresh(new_exercise)
+    return new_exercise
 
 @app.post("/workouts")
 def create_workout(
-    workout_date: date,
+    workout: WorkoutCreate,
     db: Session = Depends(get_db)
 ):
-    workout = Workout(date=workout_date)
-    db.add(workout)
+    new_workout = Workout(date=workout.workout_date)
+    db.add(new_workout)
     db.commit()
-    db.refresh(workout)
-    return workout
+    db.refresh(new_workout)
+    return new_workout
 
 @app.post("/sets")
 def add_set(
-    workout_id: int,
-    exercise_id: int,
-    weight_kg: float,
-    reps: int,
+    set_data: SetCreate,
     db: Session = Depends(get_db)
 ):
-    s = Set(
-        workout_id=workout_id,
-        exercise_id=exercise_id,
-        weight_kg=weight_kg,
-        reps=reps
+    new_set = Set(
+        workout_id=set_data.workout_id,
+        exercise_id=set_data.exercise_id,
+        weight_kg=set_data.weight_kg,
+        reps=set_data.reps
     )
-    db.add(s)
+    db.add(new_set)
     db.commit()
-    db.refresh(s)
-    return s
+    db.refresh(new_set)
+    return new_set
 
 @app.get("/workouts/{workout_id}/summary")
 def workout_summary(workout_id: int, db: Session = Depends(get_db)):
