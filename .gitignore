@@ -15,3 +15,7 @@ __pycache__/
 # Editor / OS files
 .vscode/
 .DS_Store
+
+# Lambda build artifacts
+fitness_api_lambda.zip
+lambda_package/

@@ -2,8 +2,10 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import date
 from collections import defaultdict
+from mangum import Mangum
 
 from db import SessionLocal, engine
+from db import create_workout, add_exercise, get_workout
 from models import Base, Workout, Exercise, Set
 from calculations import set_volume, set_work_joules, joules_to_calories
 from schemas import ExerciseCreate, WorkoutCreate, SetCreate
@@ -34,18 +36,6 @@ def create_exercise(
     db.commit()
     db.refresh(new_exercise)
     return new_exercise
-
-# Post a workout
-@app.post("/workouts")
-def create_workout(
-    workout: WorkoutCreate,
-    db: Session = Depends(get_db)
-):
-    new_workout = Workout(date=workout.workout_date)
-    db.add(new_workout)
-    db.commit()
-    db.refresh(new_workout)
-    return new_workout
 
 # Post a set
 @app.post("/sets")
@@ -155,3 +145,5 @@ def exercise_history(exercise_id: int, db: Session = Depends(get_db)):
         "exercise_name": exercise.name,
         "history": history
     }
+
+handler = Mangum(app)
