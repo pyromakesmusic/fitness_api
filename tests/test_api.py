@@ -4,7 +4,7 @@ from sqlalchemy.pool import StaticPool
 from sqlalchemy.orm import sessionmaker
 
 from app import app, get_db
-from models import Base
+from repositories.models import Base
 
 # Create in-memory test database
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
