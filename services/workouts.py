@@ -3,7 +3,7 @@ from repositories.base import workout_repo
 def create_workout(data):
     return workout_repo.create_workout(data)
 
-def add_exercise(workout_id, data):
+def add_set(workout_id, data):
     return workout_repo.add_exercise(workout_id, data)
 
 def get_workout(workout_id):
