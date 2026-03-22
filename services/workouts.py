@@ -9,7 +9,7 @@ def add_set(workout_id, data):
 def get_workout(workout_id):
     return workout_repo.get_workout(workout_id)
 
-def exercise_history(user_id):
+def get_workouts_for_user(user_id):
     workouts = workout_repo.get_workouts_for_user(user_id)
     # compute summaries here
     return workouts

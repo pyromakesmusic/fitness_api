@@ -18,8 +18,7 @@ class Workout(BaseModel):
 class ExerciseCreate(BaseModel):
     name: str = Field(..., min_length=1)
     movement_distance_m: float = Field(..., gt=0)
-class WorkoutCreate(BaseModel):
-    workout_date: date
+
 class SetCreate(BaseModel):
     workout_id: str
     exercise_id: str
@@ -27,3 +26,7 @@ class SetCreate(BaseModel):
     movement_distance_m: float = Field(..., gt=0)
     weight_kg: float = Field(..., gt=0)
     reps: int = Field(..., gt=0)
+
+class WorkoutCreate(BaseModel):
+    user_id: str
+    workout_date: date
