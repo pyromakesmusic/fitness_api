@@ -47,7 +47,38 @@ class SQLiteWorkoutRepository:
     def get_workout(self, workout_id):
         db = self._get_session()
         try:
-            pass
+            rows = db.query(
+                models.Workout,
+                models.Set,
+                models.Exercise
+            ).join(
+                models.Set, models.Workout.id == models.Set.workout_id
+            ).join(
+                models.Exercise, models.Set.exercise_id == models.Exercise.id
+            ).filter(
+                models.Workout.id == int(workout_id)
+            ).all()
+
+            if not rows:
+                return None
+
+            workout = rows[0][0]
+
+            sets = []
+            for _, s, e in rows:
+                sets.append(Set(
+                    exercise_id=str(e.id),
+                    exercise_name=e.name,
+                    movement_distance_m=e.movement_distance_m,
+                    weight_kg=s.weight_kg,
+                    reps=s.reps
+                ))
+
+            return Workout(
+                id=str(workout.id),
+                workout_date=workout.date,
+                sets=sets
+            )
         finally:
             db.close()
         return
@@ -55,7 +86,11 @@ class SQLiteWorkoutRepository:
     def get_workouts_for_user(self, user_id):
         db = self._get_session()
         try:
-            pass
+            workouts = db.query(models.Workout).filter(
+                models.Workout.user_id == user_id
+            ).all()
+
+            return [self.get_workout(str(w.id)) for w in workouts]
         finally:
             db.close()
         return
@@ -103,7 +138,8 @@ class SQLiteWorkoutRepository:
     def list_exercises(self, user_id):
         db = self._get_session()
         try:
-            exercises = db.query(models.Exercise).all()
+            exercises = db.query(models.Exercise).filter(
+            models.Exercise.user_id == user_id)
 
             return [
                 Exercise(
