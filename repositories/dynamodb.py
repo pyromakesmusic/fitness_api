@@ -19,6 +19,7 @@ class DynamoWorkoutRepository:
 
     def create_exercise(self, user_id, data):
         return
+
     def _pk_exercise(self, user_id, exercise_id):
         return f"USER#{user_id}", f"EXERCISE#{exercise_id}"
 
