@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, Float, String, Date, ForeignKey
 from sqlalchemy.orm import relationship
+from repositories.db import Base
 
 class Workout(Base):
     __tablename__ = "workouts"
