@@ -4,8 +4,8 @@ from repositories.db import Base
 
 class Workout(Base):
     __tablename__ = "workouts"
-
     id = Column(Integer, primary_key=True)
+    user_id = Column(String, nullable=False)
     date = Column(Date, nullable=False)
 
     sets = relationship("Set", back_populates="workout")
@@ -15,6 +15,7 @@ class Exercise(Base):
     __tablename__ = "exercises"
 
     id = Column(Integer, primary_key=True)
+    user_id = Column(String, nullable=False)
     name = Column(String, nullable=False)
     movement_distance_m = Column(Float, nullable=False)
 
