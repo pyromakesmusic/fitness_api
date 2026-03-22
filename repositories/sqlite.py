@@ -27,7 +27,6 @@ class SQLiteWorkoutRepository:
             )
         finally:
             db.close()
-        return
 
     def add_set(self, workout_id, data):
         db = self._get_session()
@@ -81,7 +80,6 @@ class SQLiteWorkoutRepository:
             )
         finally:
             db.close()
-        return
 
     def get_workouts_for_user(self, user_id):
         db = self._get_session()
@@ -93,7 +91,6 @@ class SQLiteWorkoutRepository:
             return [self.get_workout(str(w.id)) for w in workouts]
         finally:
             db.close()
-        return
 
     def create_exercise(self, user_id, data):
         db = self._get_session()
@@ -114,13 +111,13 @@ class SQLiteWorkoutRepository:
             )
         finally:
             db.close()
-        return
 
     def get_exercise(self, user_id, exercise_id):
         db = self._get_session()
         try:
             exercise = db.query(models.Exercise).filter(
-                models.Exercise.id == int(exercise_id)
+                models.Exercise.id == int(exercise_id),
+                models.Exercise.user_id == user_id
             ).first()
 
             if not exercise:
@@ -133,13 +130,12 @@ class SQLiteWorkoutRepository:
             )
         finally:
             db.close()
-        return
 
     def list_exercises(self, user_id):
         db = self._get_session()
         try:
             exercises = db.query(models.Exercise).filter(
-            models.Exercise.user_id == user_id)
+            models.Exercise.user_id == user_id).all()
 
             return [
                 Exercise(
@@ -151,4 +147,3 @@ class SQLiteWorkoutRepository:
             ]
         finally:
             db.close()
-        return "error"
