@@ -25,6 +25,9 @@ class SQLiteWorkoutRepository:
                 workout_date=workout.date,
                 sets=[]
             )
+        except Exception:
+            db.rollback()
+            raise
         finally:
             db.close()
 
@@ -39,6 +42,9 @@ class SQLiteWorkoutRepository:
             )
             db.add(new_set)
             db.commit()
+        except Exception:
+            db.rollback()
+            raise
         finally:
             db.close()
         return self.get_workout(workout_id)
@@ -88,6 +94,9 @@ class SQLiteWorkoutRepository:
                 models.Workout.user_id == user_id
             ).all()
 
+            if not workouts:
+                return None
+
             return [self.get_workout(str(w.id)) for w in workouts]
         finally:
             db.close()
@@ -109,6 +118,9 @@ class SQLiteWorkoutRepository:
                 name=exercise.name,
                 movement_distance_m=exercise.movement_distance_m
             )
+        except Exception:
+            db.rollback()
+            raise
         finally:
             db.close()
 
@@ -137,6 +149,8 @@ class SQLiteWorkoutRepository:
             exercises = db.query(models.Exercise).filter(
             models.Exercise.user_id == user_id).all()
 
+            if not exercises:
+                return None
             return [
                 Exercise(
                     id=str(e.id),
