@@ -1,5 +1,9 @@
 from fastapi.testclient import TestClient
 from app import app
+import os
+
+# Force SQLite for tests
+os.environ["DB_BACKEND"] = "sqlite"
 
 client = TestClient(app)
 
