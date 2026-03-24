@@ -1,5 +1,5 @@
 # Library Imports
-from fastapi import FastAPI, HTTPException, Header
+from fastapi import FastAPI, HTTPException, Header, Depends
 from mangum import Mangum
 
 from repositories.schemas import WorkoutCreate, SetCreate, ExerciseCreate, Workout, Exercise, Set
@@ -31,7 +31,7 @@ def get_user_id(x_user_id: str = Header(...)):
 @app.post("/workouts", response_model=Workout)
 def create_workout_endpoint(
     payload: WorkoutCreate,
-    user_id: str = Header(..., alias="X-User-Id")
+    user_id: str = Depends(get_user_id)
 ):
     return create_workout(user_id, payload)
 
@@ -54,7 +54,7 @@ def get_workout_endpoint(workout_id: str):
 
 @app.get("/workouts", response_model=list[Workout])
 def get_workouts_for_user_endpoint(
-    user_id: str = Header(..., alias="X-User-Id")
+    user_id: str = Depends(get_user_id)
 ):
     return get_workouts_for_user(user_id)
 
@@ -66,14 +66,14 @@ def get_workouts_for_user_endpoint(
 @app.post("/exercises", response_model=Exercise)
 def create_exercise_endpoint(
     payload: ExerciseCreate,
-    user_id: str = Header(..., alias="X-User-Id")
+    user_id: str = Depends(get_user_id)
 ):
     return create_exercise(user_id, payload)
 
 
 @app.get("/exercises", response_model=list[Exercise])
 def list_exercises_endpoint(
-    user_id: str = Header(..., alias="X-User-Id")
+    user_id: str = Depends(get_user_id)
 ):
     return list_exercises(user_id)
 
@@ -81,7 +81,7 @@ def list_exercises_endpoint(
 @app.get("/exercises/{exercise_id}", response_model=Exercise)
 def get_exercise_endpoint(
     exercise_id: str,
-    user_id: str = Header(..., alias="X-User-Id")
+    user_id: str = Depends(get_user_id)
 ):
     exercise = get_exercise(user_id, exercise_id)
     if not exercise:
