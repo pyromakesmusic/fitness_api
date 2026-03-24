@@ -1,7 +1,7 @@
 import boto3
 from boto3.dynamodb.conditions import Key
 from uuid import uuid4
-from schemas import Workout, Set, Exercise
+from repositories.schemas import Workout, Set, Exercise
 from datetime import date
 
 dynamodb = boto3.resource("dynamodb")

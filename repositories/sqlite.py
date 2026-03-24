@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from repositories.db import SessionLocal
 from repositories import models
-from schemas import Workout, Set, Exercise
+from repositories.schemas import Workout, Set, Exercise
 import uuid
 
 class SQLiteWorkoutRepository:
