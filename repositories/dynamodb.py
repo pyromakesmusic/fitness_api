@@ -4,10 +4,21 @@ from uuid import uuid4
 from repositories.schemas import Workout, Set, Exercise
 from datetime import date
 
-dynamodb = boto3.resource("dynamodb")
-table = dynamodb.Table("fitness-app")
-
 class DynamoWorkoutRepository:
+    def __init__(self, table_name="fitness-app", region_name=None):
+        self.table_name = table_name
+        self.region_name = region_name or "us-east-1"
+        self._dynamodb = None
+        self._table = None
+
+    @property
+    def table(self):
+        if self._table is None:
+            if self._dynamodb is None:
+                self._dynamodb = boto3.resource("dynamodb", region_name=self.region_name)
+            self._table = self._dynamodb.Table(self.table_name)
+        return self._table
+
     def _pk_user(self, user_id):
         return f"USER#{user_id}"
 
