@@ -2,7 +2,7 @@
 from fastapi import FastAPI, HTTPException, Header
 from mangum import Mangum
 
-from repositories.schemas import WorkoutCreate, SetCreate, ExerciseCreate
+from repositories.schemas import WorkoutCreate, SetCreate, ExerciseCreate, Workout, Exercise, Set
 from services.workouts import (
     create_workout,
     add_set,
@@ -28,7 +28,7 @@ def get_user_id(x_user_id: str = Header(...)):
 # WORKOUTS
 # ------------------------
 
-@app.post("/workouts")
+@app.post("/workouts", response_model=Workout)
 def create_workout_endpoint(
     payload: WorkoutCreate,
     user_id: str = Header(..., alias="X-User-Id")
@@ -36,7 +36,7 @@ def create_workout_endpoint(
     return create_workout(user_id, payload)
 
 
-@app.post("/workouts/{workout_id}/sets")
+@app.post("/workouts/{workout_id}/sets", response_model=Set)
 def add_set_endpoint(
     workout_id: str,
     payload: SetCreate
@@ -44,7 +44,7 @@ def add_set_endpoint(
     return add_set(workout_id, payload)
 
 
-@app.get("/workouts/{workout_id}")
+@app.get("/workouts/{workout_id}", response_model=Workout)
 def get_workout_endpoint(workout_id: str):
     workout = get_workout(workout_id)
     if not workout:
@@ -52,7 +52,7 @@ def get_workout_endpoint(workout_id: str):
     return workout
 
 
-@app.get("/workouts")
+@app.get("/workouts", response_model=list[Workout])
 def get_workouts_for_user_endpoint(
     user_id: str = Header(..., alias="X-User-Id")
 ):
@@ -63,7 +63,7 @@ def get_workouts_for_user_endpoint(
 # EXERCISES
 # ------------------------
 
-@app.post("/exercises")
+@app.post("/exercises", response_model=Exercise)
 def create_exercise_endpoint(
     payload: ExerciseCreate,
     user_id: str = Header(..., alias="X-User-Id")
@@ -71,14 +71,14 @@ def create_exercise_endpoint(
     return create_exercise(user_id, payload)
 
 
-@app.get("/exercises")
+@app.get("/exercises", response_model=list[Exercise])
 def list_exercises_endpoint(
     user_id: str = Header(..., alias="X-User-Id")
 ):
     return list_exercises(user_id)
 
 
-@app.get("/exercises/{exercise_id}")
+@app.get("/exercises/{exercise_id}", response_model=Exercise)
 def get_exercise_endpoint(
     exercise_id: str,
     user_id: str = Header(..., alias="X-User-Id")
