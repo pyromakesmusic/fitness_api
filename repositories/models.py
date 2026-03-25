@@ -24,6 +24,8 @@ class Set(Base):
     id = Column(String, primary_key=True, default=lambda: str(uuid4()))
     workout_id = Column(String, ForeignKey("workouts.id"))
     exercise_id = Column(String, ForeignKey("exercises.id"))
+    exercise_name = Column(String)
+    movement_distance_m = Column(Float)
     weight_kg = Column(Float, nullable=False)
     reps = Column(Integer, nullable=False)
     workout = relationship("Workout", back_populates="sets")

@@ -41,7 +41,8 @@ def test_full_workout_flow():
     response = client.post(
         "/workouts",
         headers=headers(),
-        json={"workout_date": "2025-01-01"}
+        json={"workout_date": "2025-01-01",
+              "user_id": TEST_USER_ID}
     )
     assert response.status_code == 200
     workout_id = response.json()["id"]

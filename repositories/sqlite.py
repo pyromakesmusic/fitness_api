@@ -10,7 +10,7 @@ class SQLiteWorkoutRepository:
         self.Session = sessionmaker(bind=self.engine)
 
     def init_db(self):
-        Base.metadata.create_all(self.engine)  # Creates all tables
+        Base.metadata.create_all(bind=self.engine)  # Creates all tables
     def _get_session(self) -> Session:
         return self.Session()
 
@@ -19,7 +19,7 @@ class SQLiteWorkoutRepository:
         try:
             workout = Workout(
                 user_id=user_id,
-                date=data.workout_date
+                workout_date=data.workout_date
             )
             db.add(workout)
             db.commit()
@@ -27,7 +27,7 @@ class SQLiteWorkoutRepository:
 
             return Workout(
                 id=str(workout.id),
-                workout_date=workout.date,
+                workout_date=workout.workout_date,
                 sets=[]
             )
         except Exception:
@@ -40,8 +40,8 @@ class SQLiteWorkoutRepository:
         db = self._get_session()
         try:
             new_set = Set(
-                workout_id=int(workout_id),
-                exercise_id=int(data.exercise_id),
+                workout_id=workout_id,
+                exercise_id=data.exercise_id,
                 weight_kg=data.weight_kg,
                 reps=data.reps
             )
@@ -66,7 +66,7 @@ class SQLiteWorkoutRepository:
             ).join(
                 Exercise, Set.exercise_id == Exercise.id
             ).filter(
-                Workout.id == int(workout_id)
+                Workout.id == str(workout_id)
             ).all()
 
             if not rows:
@@ -86,7 +86,7 @@ class SQLiteWorkoutRepository:
 
             return Workout(
                 id=str(workout.id),
-                workout_date=workout.date,
+                workout_date=workout.workout_date,
                 sets=sets
             )
         finally:

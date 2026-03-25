@@ -20,7 +20,6 @@ class ExerciseCreate(BaseModel):
     movement_distance_m: float = Field(..., gt=0)
 
 class SetCreate(BaseModel):
-    workout_id: str
     exercise_id: str
     exercise_name: str
     movement_distance_m: float = Field(..., gt=0)
