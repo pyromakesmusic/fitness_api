@@ -42,17 +42,20 @@ class SQLiteWorkoutRepository:
             new_set = Set(
                 workout_id=workout_id,
                 exercise_id=data.exercise_id,
+                exercise_name=data.exercise_name,
+                movement_distance_m=data.movement_distance_m,
                 weight_kg=data.weight_kg,
                 reps=data.reps
             )
             db.add(new_set)
             db.commit()
+            db.refresh(new_set)  # make sure new_set has its ID
+            return new_set  # ✅ return the Set instance, not the Workout
         except Exception:
             db.rollback()
             raise
         finally:
             db.close()
-        return self.get_workout(workout_id)
 
     def get_workout(self, workout_id):
         db = self._get_session()

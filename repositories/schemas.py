@@ -11,10 +11,18 @@ class Set(BaseModel):
     movement_distance_m: float
     weight_kg: float
     reps: int
+
+    class Config:
+        from_attributes = True
+        from_orm = True
 class Workout(BaseModel):
     id: str
     workout_date: date
     sets: list[Set]
+
+    class Config:
+        from_attributes=True
+        orm_mode = True
 class ExerciseCreate(BaseModel):
     name: str = Field(..., min_length=1)
     movement_distance_m: float = Field(..., gt=0)

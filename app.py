@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException, Header, Depends
 from mangum import Mangum
 
 from repositories.schemas import WorkoutCreate, SetCreate, ExerciseCreate, Workout, Exercise, Set
+from repositories.base import workout_repo
 from services.workouts import (
     create_workout,
     add_set,
@@ -37,11 +38,11 @@ def create_workout_endpoint(
 
 
 @app.post("/workouts/{workout_id}/sets", response_model=Set)
-def add_set_endpoint(
-    workout_id: str,
-    payload: SetCreate
-):
-    return add_set(workout_id, payload)
+def add_set_endpoint(workout_id: str, payload: Set):
+    # add the set to DB
+    set_row = workout_repo.add_set(workout_id, payload)  # pass payload as a single argument
+    # Return the created set (SQLAlchemy model)
+    return Set.from_orm(set_row)
 
 
 @app.get("/workouts/{workout_id}", response_model=Workout)
