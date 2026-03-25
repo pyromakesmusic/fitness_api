@@ -1,8 +1,16 @@
-from sqlalchemy.orm import Session
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
 from repositories.db import SessionLocal
 from repositories import models
 from repositories.schemas import Workout, Set, Exercise
 import uuid
+
+# Engine used for both production SQLite and testing
+engine = create_engine(
+    "sqlite:///./sqlite.db",  # or ":memory:" if you want in-memory for tests
+    connect_args={"check_same_thread": False}
+)
+SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 class SQLiteWorkoutRepository:
 

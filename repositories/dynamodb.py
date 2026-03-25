@@ -34,7 +34,7 @@ class DynamoWorkoutRepository:
     def create_workout(self, user_id, data):
         workout_id = str(uuid4())
 
-        table.put_item(Item={
+        self._table.put_item(Item={
             "PK": self._pk_workout(workout_id),
             "SK": "METADATA",
             "user_id": user_id,
@@ -56,12 +56,12 @@ class DynamoWorkoutRepository:
             **self._serialize_set(data)
         }
 
-        table.put_item(Item=item)
+        self._table.put_item(Item=item)
 
         return self.get_workout(workout_id)
 
     def get_workout(self, workout_id):
-        response = table.query(
+        response = self._table.query(
             KeyConditionExpression=Key("PK").eq(self._pk_workout(workout_id))
         )
 
@@ -73,7 +73,7 @@ class DynamoWorkoutRepository:
 
     def get_workouts_for_user(self, user_id):
         # Requires a GSI on user_id
-        response = table.query(
+        response = self._table.query(
             IndexName="user_id-index",
             KeyConditionExpression=Key("user_id").eq(user_id)
         )
@@ -101,7 +101,7 @@ class DynamoWorkoutRepository:
         exercise_id = str(uuid4())
         pk, sk = self._pk_exercise(user_id, exercise_id)
 
-        table.put_item(Item={
+        self._table.put_item(Item={
             "PK": pk,
             "SK": sk,
             "name": data.name,
@@ -117,7 +117,7 @@ class DynamoWorkoutRepository:
     def get_exercise(self, user_id, exercise_id):
         pk, sk = self._pk_exercise(user_id, exercise_id)
 
-        response = table.get_item(Key={
+        response = self._table.get_item(Key={
             "PK": pk,
             "SK": sk
         })
@@ -133,7 +133,7 @@ class DynamoWorkoutRepository:
         )
 
     def list_exercises(self, user_id):
-        response = table.query(
+        response = self._table.query(
             KeyConditionExpression=Key("PK").eq(self._pk_user(user_id)) &
                                    Key("SK").begins_with("EXERCISE#")
         )
