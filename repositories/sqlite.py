@@ -1,9 +1,11 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import Session, sessionmaker, declarative_base
 from repositories.db import SessionLocal
 from repositories import models
 from repositories.schemas import Workout, Set, Exercise
 import uuid
+
+Base = declarative_base()
 
 # Engine used for both production SQLite and testing
 engine = create_engine(
@@ -13,7 +15,13 @@ engine = create_engine(
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 class SQLiteWorkoutRepository:
+    def __init__(self, session=None):
+        self.session = session or SessionLocal()
 
+    # Add this class method:
+    @classmethod
+    def init_db(cls):
+        Base.metadata.create_all(bind=engine)
     def _get_session(self) -> Session:
         return SessionLocal()
 
