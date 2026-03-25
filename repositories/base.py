@@ -9,7 +9,7 @@ if DB_BACKEND == "sqlite":
     from repositories.sqlite import SQLiteWorkoutRepository
     workout_repo = SQLiteWorkoutRepository()
     # initialize tables for SQLite
-    SQLiteWorkoutRepository.init_db()
+    workout_repo.init_db()
 else:
     from repositories.dynamodb import DynamoWorkoutRepository
     workout_repo = DynamoWorkoutRepository()

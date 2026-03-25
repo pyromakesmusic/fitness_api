@@ -3,23 +3,16 @@ from sqlalchemy.orm import Session, sessionmaker
 from repositories.models import Base, Workout, Set, Exercise
 import uuid
 
-engine = create_engine(
-    "sqlite:///:memory:",  # in-memory for tests
-    connect_args={"check_same_thread": False}
-)
-
-SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 class SQLiteWorkoutRepository:
-    def __init__(self, session=None):
-        self.session = session or SessionLocal()
+    def __init__(self, db_url="sqlite:///fitness.db"):
+        self.engine = create_engine(db_url, echo=True)
+        self.Session = sessionmaker(bind=self.engine)
 
-    # Add this class method:
-    @classmethod
-    def init_db(cls):
-        Base.metadata.create_all(bind=engine)
+    def init_db(self):
+        Base.metadata.create_all(self.engine)  # Creates all tables
     def _get_session(self) -> Session:
-        return SessionLocal()
+        return self.Session()
 
     def create_workout(self, user_id, data):
         db = self._get_session()
