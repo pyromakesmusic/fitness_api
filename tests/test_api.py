@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from app import app
 
 if os.environ["DB_BACKEND"].lower() == "sqlite":
-    from repositories.models import Base, engine  # engine comes from SQLite repo
+    from repositories.sqlite import Base, engine  # engine comes from SQLite repo
     Base.metadata.create_all(bind=engine)
 
 client = TestClient(app)

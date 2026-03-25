@@ -1,17 +1,13 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker, declarative_base
-from repositories.db import SessionLocal
-from repositories import models
-from repositories.schemas import Workout, Set, Exercise
+from sqlalchemy.orm import Session, sessionmaker
+from repositories.models import Base, Workout, Set, Exercise
 import uuid
 
-Base = declarative_base()
-
-# Engine used for both production SQLite and testing
 engine = create_engine(
-    "sqlite:///./sqlite.db",  # or ":memory:" if you want in-memory for tests
+    "sqlite:///:memory:",  # in-memory for tests
     connect_args={"check_same_thread": False}
 )
+
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 class SQLiteWorkoutRepository:
@@ -28,7 +24,7 @@ class SQLiteWorkoutRepository:
     def create_workout(self, user_id, data):
         db = self._get_session()
         try:
-            workout = models.Workout(
+            workout = Workout(
                 user_id=user_id,
                 date=data.workout_date
             )
@@ -50,7 +46,7 @@ class SQLiteWorkoutRepository:
     def add_set(self, workout_id, data):
         db = self._get_session()
         try:
-            new_set = models.Set(
+            new_set = Set(
                 workout_id=int(workout_id),
                 exercise_id=int(data.exercise_id),
                 weight_kg=data.weight_kg,
@@ -69,15 +65,15 @@ class SQLiteWorkoutRepository:
         db = self._get_session()
         try:
             rows = db.query(
-                models.Workout,
-                models.Set,
-                models.Exercise
+                Workout,
+                Set,
+                Exercise
             ).join(
-                models.Set, models.Workout.id == models.Set.workout_id
+                Set, Workout.id == Set.workout_id
             ).join(
-                models.Exercise, models.Set.exercise_id == models.Exercise.id
+                Exercise, Set.exercise_id == Exercise.id
             ).filter(
-                models.Workout.id == int(workout_id)
+                Workout.id == int(workout_id)
             ).all()
 
             if not rows:
@@ -106,8 +102,8 @@ class SQLiteWorkoutRepository:
     def get_workouts_for_user(self, user_id):
         db = self._get_session()
         try:
-            workouts = db.query(models.Workout).filter(
-                models.Workout.user_id == user_id
+            workouts = db.query(Workout).filter(
+                Workout.user_id == user_id
             ).all()
 
             if not workouts:
@@ -120,7 +116,7 @@ class SQLiteWorkoutRepository:
     def create_exercise(self, user_id, data):
         db = self._get_session()
         try:
-            exercise = models.Exercise(
+            exercise = Exercise(
                 name=data.name,
                 movement_distance_m=data.movement_distance_m,
                 user_id=user_id  # only if you added this column
@@ -143,9 +139,9 @@ class SQLiteWorkoutRepository:
     def get_exercise(self, user_id, exercise_id):
         db = self._get_session()
         try:
-            exercise = db.query(models.Exercise).filter(
-                models.Exercise.id == int(exercise_id),
-                models.Exercise.user_id == user_id
+            exercise = db.query(Exercise).filter(
+                Exercise.id == int(exercise_id),
+                Exercise.user_id == user_id
             ).first()
 
             if not exercise:
@@ -162,8 +158,8 @@ class SQLiteWorkoutRepository:
     def list_exercises(self, user_id):
         db = self._get_session()
         try:
-            exercises = db.query(models.Exercise).filter(
-            models.Exercise.user_id == user_id).all()
+            exercises = db.query(Exercise).filter(
+            Exercise.user_id == user_id).all()
 
             if not exercises:
                 return None

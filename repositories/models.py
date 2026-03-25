@@ -1,36 +1,29 @@
 from sqlalchemy import Column, Integer, Float, String, Date, ForeignKey
-from sqlalchemy.orm import relationship
-from repositories.db import Base
+from sqlalchemy.orm import relationship, declarative_base
+from uuid import uuid4
 
-class Workout(Base):
-    __tablename__ = "workouts"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(String, nullable=False)
-    date = Column(Date, nullable=False)
-
-    sets = relationship("Set", back_populates="workout")
+Base = declarative_base()
 
 
 class Exercise(Base):
     __tablename__ = "exercises"
-
-    id = Column(Integer, primary_key=True)
+    id = Column(String, primary_key=True, default=lambda: str(uuid4()))
     user_id = Column(String, nullable=False)
     name = Column(String, nullable=False)
     movement_distance_m = Column(Float, nullable=False)
 
-    sets = relationship("Set", back_populates="exercise")
-
+class Workout(Base):
+    __tablename__ = "workouts"
+    id = Column(String, primary_key=True, default=lambda: str(uuid4()))
+    user_id = Column(String, nullable=False)
+    workout_date = Column(Date, nullable=False)
+    sets = relationship("Set", back_populates="workout")
 
 class Set(Base):
     __tablename__ = "sets"
-
-    id = Column(Integer, primary_key=True)
-    workout_id = Column(Integer, ForeignKey("workouts.id"))
-    exercise_id = Column(Integer, ForeignKey("exercises.id"))
-
+    id = Column(String, primary_key=True, default=lambda: str(uuid4()))
+    workout_id = Column(String, ForeignKey("workouts.id"))
+    exercise_id = Column(String, ForeignKey("exercises.id"))
     weight_kg = Column(Float, nullable=False)
     reps = Column(Integer, nullable=False)
-
     workout = relationship("Workout", back_populates="sets")
-    exercise = relationship("Exercise", back_populates="sets")
