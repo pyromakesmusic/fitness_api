@@ -3,18 +3,15 @@ import { Link } from "react-router-dom";
 export default function Dashboard() {
   return (
     <div>
-      <h1>Dashboard</h1>
+      <h2>Dashboard</h2>
 
-      <nav style={{ display: "flex", gap: 10 }}>
-        <Link to="/dashboard">Dashboard</Link>
-        <Link to="/history">History</Link>
-        <Link to="/stats">Stats</Link>
-        <Link to="/settings">Settings</Link>
-      </nav>
-
-      <button style={{ marginTop: 20, fontSize: 20 }}>
+      <button className="primary-btn">
         Record Exercise
       </button>
+
+      <div style={{ marginTop: 20, color: "#b3b3b3" }}>
+        This week summary will go here
+      </div>
     </div>
   );
 }
