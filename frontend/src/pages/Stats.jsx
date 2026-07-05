@@ -20,7 +20,7 @@ const emptyData = [
 
 export default function Stats() {
   return (
-    <div>
+    <div className="card">
       <h2>Stats</h2>
 
       <div style={{ width: "100%", height: 300, marginTop: 20 }}>

@@ -112,3 +112,10 @@ body {
   color: var(--muted);
   margin-bottom: 8px;
 }
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+}
